@@ -25,7 +25,17 @@ function log() {
 
 RUN_ID=$(head -c 32 /dev/random | sha1sum | cut -f1 -d' ')
 
-log "PWD: $(pwd)\nID: $(id)\nENV: $(env | xargs echo)\nRUN_ID: $RUN_ID\nacme.sh: $(acme.sh --version | tr '\n' '\t')\nkubectl: $(kubectl version --client 2>/dev/null | tr '\n' '\t')" >&2
+log "Starting k8s-acme-chore
+----------------------------
+GitCommit: $GIT_COMMIT_SHA
+BuildTimestamp: $BUILD_TIMESTAMP
+RunId: $RUN_ID
+WorkDir: $(pwd)
+User: $(id)
+Env: $(env | xargs echo)
+acme.sh: $(acme.sh --version | tr '\n' '\t')
+kubectl: $(kubectl version --client 2>/dev/null | tr '\n' '\t')
+----------------------------"
 
 [[ -z $ACCOUNT_EMAIL ]] && log ERROR "missing ACCOUNT_EMAIL" && exit 3
 [[ -z $DOMAINS ]] && log ERROR "missing DOMAINS" && exit 3

@@ -1,3 +1,6 @@
+GIT_COMMIT_SHA ?= $(shell git rev-parse --short HEAD)
+BUILD_TIMESTAMP ?= $(shell date --utc --iso-8601=minutes)
+
 .PHONY: run-image
 run-image:
 	@set -e; \
@@ -31,8 +34,8 @@ run-image:
 image:
 	@set -e; \
 	tag=$${tag:-"acme-chore"}; \
-	docker build -t $$tag -f Dockerfile .; \
-	read -p "Push (Y/n)?" && [[ $${REPLY,} == "y" ]] && docker push $$tag;
+	docker build -t $$tag -f Dockerfile --build-arg GIT_COMMIT_SHA=$(GIT_COMMIT_SHA) --build-arg BUILD_TIMESTAMP=$(BUILD_TIMESTAMP) .; \
+	[[ -n $$push ]] || { read -p "Push (Y/n)?" && [[ $${REPLY,} == "y" ]]; } && docker push $$tag;
 
 .PHONY: build-and-push-multi-arch-image
 build-and-push-multi-arch-image:  
