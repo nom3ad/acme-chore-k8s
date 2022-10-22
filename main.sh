@@ -57,6 +57,7 @@ KUBECTL_CONTEXT=${KUBECTL_CONTEXT:-""}
 FORCE_RENEW=${FORCE_RENEW:-"false"}
 VALID_TO=${VALID_TO:-""}
 KEY_LENGTH=${KEY_LENGTH:-""}
+HTTPS_INSECURE=${HTTPS_INSECURE:-""}
 
 if [[ $HTTP_SCHEME == "https" ]]; then
     PORT="44380"
@@ -251,6 +252,9 @@ function do_acme() {
     fi
     if [[ -n $KEY_LENGTH ]]; then
         args+=("--keylength" "$KEY_LENGTH")
+    fi
+    if [[ $HTTPS_INSECURE == true || $HTTPS_INSECURE == 1 ]]; then
+        args+=("--insecure")
     fi
     for d in "${DOMAINS[@]}"; do
         args+=("-d" "$d")
