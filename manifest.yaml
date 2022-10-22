@@ -1,0 +1,207 @@
+---
+kind: Namespace
+apiVersion: v1
+metadata:
+  name: example
+
+---
+apiVersion: v1
+kind: Secret
+type: kubernetes.io/tls
+metadata:
+  name: web-tls-cert
+  namespace: example
+data:
+  tls.crt: LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSURWVENDQWoyZ0F3SUJBZ0lVZE4yODU3d1VLUE9SVUJ1d0JiOVIrME8vbzJFd0RRWUpLb1pJaHZjTkFRRUwKQlFBd09qRVhNQlVHQTFVRUF3d09LaTVsZUdGdGNHeGxMblJsYzNReEh6QWRCZ05WQkFvTUZtOWphUzFzWWkxcApibWR5WlhOekxXVjRZVzF3YkdVd0hoY05Nakl3TkRJek1EZ3lOalF5V2hjTk1qWXdOREl5TURneU5qUXlXakE2Ck1SY3dGUVlEVlFRRERBNHFMbVY0WVcxd2JHVXVkR1Z6ZERFZk1CMEdBMVVFQ2d3V2IyTnBMV3hpTFdsdVozSmwKYzNNdFpYaGhiWEJzWlRDQ0FTSXdEUVlKS29aSWh2Y05BUUVCQlFBRGdnRVBBRENDQVFvQ2dnRUJBTDdxalNFSwowZmE2K2FhTk1SZmVUcmc5U2VaQVhWUHIwbVRFM2lKMlRLaXY1dlIzeXlNemRtRW9iVTl5cWpTcHMwRUphTE1BCm9tUjRmUG02czdoeEJFUnhJTG1qZHRSdElUQjYrazJhTVA2cEY3WkZIU2I2RWhtYWlmNzhRbk5aWWpwbVpsTDUKSzNEMUhaTldCQXpXVmhxOElqdnZ0R3ArTStFK1M4VXBqOTU3Und5VC9lZG5ETzNEbzFRUkpZV0RtclZBK21IYwo3QjYxankwdlhnbFlEbWp3cjc2bmRXVTlud2xVajVhcElaQnpSUTNxQ2t6bDQvaW5yNWdhNUF6WFNzaXlzN1BOCkk4eENieW14SGhnRFBkdkc4bzAzV2R1QjZmQklyeTRlb09uZlczSHNvajI5amt5SVpOYlJwZ1VEbW1Oc1EzbHAKdnlJRkxEZC83N2tkVTNzQ0F3RUFBYU5UTUZFd0hRWURWUjBPQkJZRUZQTXAwNVdUTitGNkp3WnQ5ODlGUk9DSQpTanhCTUI4R0ExVWRJd1FZTUJhQUZQTXAwNVdUTitGNkp3WnQ5ODlGUk9DSVNqeEJNQThHQTFVZEV3RUIvd1FGCk1BTUJBZjh3RFFZSktvWklodmNOQVFFTEJRQURnZ0VCQUVZL0x6V0pqTkM4a2QvZDlwaG5uc2JWemxqQ1lhZDQKeTRtR21kVVo2NWpqOTlxQ3EvemhxL082ZDkvUHk1MnBDTDlVVjMxdjdJU2p1N1Q2ZjZZa2pMTjZuODlRT1NIaApEWHBXUWxmL1JwMi9sMEtpNHNxZjZQdkxCSXlhMXNwMVU5SEE5NmpPV1lGdFVsdVVHN2Qvd2toa0tKQkZRbVJLCmZmelcxQmVoSFpLMTByQVFIK0FKeGxGMWRtWUt6MlllcDFQVUQ2YnpZT0g4RVg5Mkd1TTJDM1g2WXBqcnB6TEoKQk5RVVZUa1FWbHdEc3kxVEs2dHBKZUpvMjJEK2k2MjBoS0RKcUhzVjdDblkvcUR2MDJ1ajhxdzJ5Wk96Skh3LwpYRWJSYVBUckJWTnZBRjkzcXIyRENLR0pHWjFPU1dkZ1lPK241Yk5hckc0VzBvWEN2c0pLS2V3PQotLS0tLUVORCBDRVJUSUZJQ0FURS0tLS0tCg==
+  tls.key: LS0tLS1CRUdJTiBQUklWQVRFIEtFWS0tLS0tCk1JSUV2UUlCQURBTkJna3Foa2lHOXcwQkFRRUZBQVNDQktjd2dnU2pBZ0VBQW9JQkFRQys2bzBoQ3RIMnV2bW0KalRFWDNrNjRQVW5tUUYxVDY5Smt4TjRpZGt5b3IrYjBkOHNqTTNaaEtHMVBjcW8wcWJOQkNXaXpBS0prZUh6NQp1ck80Y1FSRWNTQzVvM2JVYlNFd2V2cE5takQrcVJlMlJSMG0raElabW9uKy9FSnpXV0k2Wm1aUytTdHc5UjJUClZnUU0xbFlhdkNJNzc3UnFmalBoUGt2RktZL2VlMGNNay8zblp3enR3Nk5VRVNXRmc1cTFRUHBoM093ZXRZOHQKTDE0SldBNW84SysrcDNWbFBaOEpWSStXcVNHUWMwVU42Z3BNNWVQNHA2K1lHdVFNMTBySXNyT3p6U1BNUW04cApzUjRZQXozYnh2S05OMW5iZ2Vud1NLOHVIcURwMzF0eDdLSTl2WTVNaUdUVzBhWUZBNXBqYkVONWFiOGlCU3czCmYrKzVIVk43QWdNQkFBRUNnZ0VBRVdpaDVkbHV1K2pneXVjbEN1QWluWG81T3QyenBPdGtDL3hIcFN6VVlLMXAKaWZGQ2ZMczhtQzl2aUVjVWJpanJSNHJzR1NaOXFGdTBTYkZVb2dUc05yRjZJbk5kYXBGbzdWckphRG9mTFptTgpwL2sxWjFCMlJnOXBkZTdhd0ZudU14VVRUNDJaQUh2WmJvM3hZSnBLejdWSUNkOFp2SHcxanR4M1hFc2w2MHQ1Cis2ZGgvNjBTYTlCc0Z3MWNOQ3A4Wko2Q2M2QlVPd1ZDYW9hZkt2eFNsLzNWaHBMeFZzbkZzOFZFbE5lcjNVYlkKWTFvSUVocGx0aTA4T1lzVzMvd1IwM1AzNUFSaVE5Zk1MUXh5NU1nV0YwbmdmcGxyZ3dSVGYyNHJObDB3SE1BTAp3WU0zYm1IMEdkUmJ4dHNaZThRMzlMRzd0b1lBVnc4R0ExaXp6MUx2UVFLQmdRRHg3TE9rQVBRMDZJMnR1S3lnCnVxd2hlUllidkZEK01wekVHTHVGaU1RODhZYlJRd1JNRk50S1Y5cURzMmk0ZHdtS1phRks2VGx5OVpiN01BOTIKeDZTbml6UktEck40QUlwdTlpYXFpZThGV0dmN1Y3bnM4OWdpZFcvdzZXWFM2YUVyUGFTT0puVHk1ai9ua0l4TQovSCt1dWkzbXRzQk1iQVYyamQ1a21WcUY1UUtCZ1FES0JoMXovR3ZtWUQrUEtUWEZmNEMrMTZGOE12YmI5VWs1CmNKaHhSNG43eHVjUC9IbGE3cFNFRjNtd1M1Z2N6cFpoZGMyUithd2JUN1JxRjRuZDQyYW1zQTB0VkdHMmFPNTkKYkdjbnc4R0JpVExFSUNrSG5mMGV0V0N1L3NzSWhUU1NKcDRPaWdlNnhDb1hXb25mdzdydnZBVWRBYVZpWXhkNwpUU2ZyYkR6ZDN3S0JnRTRUeFhwVnNIcnUzdUxGS2ptSlpZbzhDUTJVZmxNN3hHcHBUUVB3dXR5c1dvVm82cGNmCldCS3JQZU9wWUUvQVl6emVSZXJtVUZzd3RiU0ZzMGZ6Y01sOTNMZFYvVWZxYk1NWkFDdWo3cGM4Qy9zTE9mOG0KUjRmL2ZNdzBsMTgxZFlWK0ZJQ29HckJWN1NQdis4ZlE2ZWhiUC9zbzJmRVFIOGMrVEJzTmZ6Q2RBb0dBQ0k2cAp3TGY0ZWhHcG40N0hVRTVPVGNja2QvWlFycEI5UVltYmEzRDBUMDNsaTYvT0ZDUDI5b0ZvRGllbGtkTE9XK0o1CmlxMWd0T2R6Wk9zS1UvUEY3Vm1YdFV2VnQ3eEtIZFh4cUtXS0ZNcVM4K3ZJMFNISUR2enYwM25IYjl6MGxSdzkKcGJBREU4NHJXa0hqaFM3dFJDcGFyUmZjd1lZaEFJQU1LTlMwMzFFQ2dZRUFuUUpQQzF6aXp1emhmRWNLdGY3RgpFZDF1ZlBHL2hmbERwWnJ3S1dERGF5UDhTTFZqUEpNUTN4MkNrZ05acTJlZWdPZG5sTVExWDJLUWZmblF0WUNiClptMnBiMXZkVWhGSXdBaUFRQUVuUEFhd2g2ZUMyOHBqMUlybWNIdjRoQXNiZUF1SWxLWWJtUXZOd2pzTE5DU0wKVk9zaUFNbTZRc01mQmpGNGF1S1ROK0U9Ci0tLS0tRU5EIFBSSVZBVEUgS0VZLS0tLS0K
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: nginx-config
+  namespace: example
+data:
+  default.conf: |
+    server {
+        listen       80;
+        server_name  "";
+        location / {
+            root   /usr/share/nginx/html;
+            index  index.html index.htm;
+        }
+        error_page  404 /404.html;
+    }
+  index.html: |
+    <head>
+        <title>web</title>
+        <style> body { font-family: monospace; background-color: #BFB; color: #333; } </style>
+    </head>
+    <body>
+        <h1>Hello world!</h1>
+    </body>
+    </html>
+  404.html: |
+    <head>
+        <title>Not Found</title>
+        <style> body { font-family: monospace; background-color: #BFB; color: #F55; } </style>
+    </head>
+    <body>
+        <h1>404!</h1>
+    </body>
+    </html>
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: web
+  namespace: example
+spec:
+  selector:
+    matchLabels:
+      app: web
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: web
+    spec:
+      containers:
+        - name: web
+          image: nginx
+          resoures:
+          ports:
+            - containerPort: 80
+          volumeMounts:
+            - name: html
+              mountPath: /usr/share/nginx/html
+            - name: conf
+              mountPath: /etc/nginx/conf.d/default.conf
+              subPath: default.conf
+      volumes:
+        - name: html
+          configMap:
+            name: nginx-config
+        - name: conf
+          configMap:
+            name: nginx-config
+            items:
+              - key: default.conf
+                path: default.conf
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: web
+  namespace: example
+  labels:
+    app: web
+spec:
+  type: ClusterIP
+  ports:
+    - port: 80
+      protocol: TCP
+  selector:
+    app: web
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: acme-chore
+  namespace: example
+spec:
+  selector:
+    matchLabels:
+      app: acme-chore
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: acme-chore
+    spec:
+      containers:
+        - name: acme-chore
+          image: traefik/whoami
+          resoures:
+          ports:
+            - containerPort: 8080
+# ---
+# apiVersion: v1
+# kind: Service
+# metadata:
+#   name: acme-chore
+#   namespace: example
+#   labels:
+#     app: acme-chore
+# spec:
+#   type: ClusterIP
+#   selector:
+#     app: acme-chore
+#   ports:
+#     - port: 44380
+#       targetPort: 8080
+#       protocol: TCP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: acme-chore
+  namespace: example
+  labels:
+    app: acme-chore
+spec:
+  type: ExternalName
+  selector:
+    app: acme-chore
+  externalName: 172-31-0-11.nip.io
+
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: example-ingress
+  namespace: example
+spec:
+  ingressClassName: nginx
+  tls:
+    - hosts:
+        - k3s.dial.mywire.org
+        - www.dial.mywire.org
+      secretName: web-tls-cert
+  rules:
+    - host: "k3s.dial.mywire.org"
+      http:
+        paths:
+          - path: /.well-known/acme-challenge
+            pathType: Prefix
+            backend:
+              service:
+                name: acme-chore
+                port:
+                  number: 44380
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: web
+                port:
+                  number: 80
+    - host: "www.dial.mywire.org"
+      http:
+        paths:
+          - path: /.well-known
+            pathType: Prefix
+            backend:
+              service:
+                name: acme-chore
+                port:
+                  number: 44380
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: web
+                port:
+                  number: 80
