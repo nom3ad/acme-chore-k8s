@@ -7,6 +7,7 @@ function log() {
     FG_RED='\033[1;31m' # bold red
     FG_GREEN='\033[0;32m'
     FG_YELLOW='\033[0;33m'
+    FG_GREY='\033[1;37m'
     local msg
     msg="$(date +"%Y-%m-%dT%H:%M:%S%z") $*"
     case "$1" in
@@ -18,6 +19,9 @@ function log() {
         ;;
     WARN)
         msg="$FG_YELLOW$msg$FG_RESET"
+        ;;
+    *)
+        msg="$FG_GREY$msg$FG_RESET"
         ;;
     esac
     echo -e "$msg" >&2
@@ -68,7 +72,7 @@ fi
 
 if [[ ! -d $DATA_DIR ]]; then
     log "Creating data directory: $DATA_DIR"
-    dir -p "$DATA_DIR"
+    mkdir -p "$DATA_DIR"
 fi
 
 SUPPORTED_CA_SERVERS=(letsencrypt zerossl buypass letsencrypt_test buypass_test)
@@ -158,7 +162,7 @@ function check_certificate_is_good() {
 
 }
 
-function load_config() {
+function load_ca_config() {
     log "Loading configuration from configMap: $CONFIG_MAP "
     ca_gz_b64=$(kubectl "${KUBECTL_ARGS[@]}" get configmaps "$CONFIG_MAP" --output jsonpath='{.binaryData.ca_tgz}' --ignore-not-found)
     if [[ -z $ca_gz_b64 ]]; then
@@ -169,7 +173,7 @@ function load_config() {
     base64 -d <<<"$ca_gz_b64" | tar -xzv -C "$DATA_DIR"
 }
 
-function store_config() {
+function store_ca_config() {
     local ca_config_dir="ca"
     log "Archiving ca configuration directory '$ca_config_dir' from $DATA_DIR  to /tmp/ca.tgz"
     tar -czv -f "/tmp/ca.tgz" -C "$DATA_DIR" "$ca_config_dir"
@@ -227,8 +231,10 @@ function do_acme() {
         args+=("--debug" "$DEBUG")
     fi
     if [[ $IS_REGISTERED != true ]]; then
-        log "Registering account for CA $CA_SERVER with email $ACCOUNT_EMAIL"
+        log "Try registering account for CA $CA_SERVER with email $ACCOUNT_EMAIL"
         acme.sh --home "$DATA_DIR" --register-account --server "$CA_SERVER" -m "$ACCOUNT_EMAIL" --log-level 2
+        IS_REGISTERED=true
+        store_ca_config
     fi
 
     if [[ $FORCE_RENEW == true || $FORCE_RENEW == 1 || $FORCE_RENEW == now ]]; then
@@ -271,7 +277,7 @@ log "Domains=${DOMAINS[*]/ /|} Email=$EMAIL Secret=$NAMESPACE/$TLS_SECRET CAServ
 
 trap 'echo "[At exit hook]" && jobs %% 2>/dev/null && echo "Killing background tasks..." && kill -s SIGTERM $(jobs -p) && wait' EXIT
 
-load_config
+load_ca_config
 
 while true; do
     test_server start
@@ -291,11 +297,7 @@ while true; do
         case "$?" in
         1)
             log "Renewing certificate | FORCE_RENEW=$FORCE_RENEW"
-            if do_acme; then
-                store_config || log "ERROR: store_config() failed with EC=$?"
-            else
-                log "ERROR: do_acme() failed with EC=$?"
-            fi
+            do_acme || log "ERROR: do_acme() failed with EC=$?"
             ;;
         *)
             log ERROR "Failed to check certificate state. EC=$?"
