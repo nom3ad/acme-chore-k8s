@@ -1,7 +1,7 @@
 FROM alpine:latest
 
 RUN addgroup -g 1000 acme && adduser acme -D -H -u 1000 -G acme && \
-    apk --no-cache add coreutils bash acme.sh thttpd && \
+    apk --no-cache add coreutils bash acme.sh mini_httpd && \
     curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl" && \
     chmod +x ./kubectl && \
     mv ./kubectl /usr/local/bin/kubectl && \

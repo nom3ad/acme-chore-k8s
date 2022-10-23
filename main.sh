@@ -58,6 +58,7 @@ FORCE_RENEW=${FORCE_RENEW:-"false"}
 VALID_TO=${VALID_TO:-""}
 KEY_LENGTH=${KEY_LENGTH:-""}
 HTTPS_INSECURE=${HTTPS_INSECURE:-""}
+HTTP_SERVER_AUTO_STOP=${HTTP_SERVER_AUTO_STOP:-"true"}
 
 if [[ $HTTP_SCHEME == "https" ]]; then
     PORT="44380"
@@ -197,7 +198,7 @@ function update_secret() {
 function http_server() {
     case "$1" in
     start)
-        if kill -n 0 "$SERVER_PID" 2>/dev/null; then
+        if kill -0 "$SERVER_PID" 2>/dev/null; then
             log WARN "http server is already running as pid: $SERVER_PID"
             return
         fi
@@ -211,7 +212,7 @@ function http_server() {
         if command -v thttpd >/dev/null; then
             http_cmd="thttpd -d $www_dir -p $PORT -D"
         elif command -v mini_httpd >/dev/null; then
-            http_cmd="mini_httpd -d $www_dir"
+            http_cmd="mini_httpd -d $www_dir -p $PORT -D"
         elif command -v darkhttpd >/dev/null; then
             http_cmd="darkhttpd $www_dir --port PORT"
         else
@@ -222,14 +223,14 @@ function http_server() {
         eval "$http_cmd &"
         SERVER_PID=$!
         sleep 1s
-        if kill -n 0 "$SERVER_PID" 2>/dev/null; then
+        if kill -0 "$SERVER_PID" 2>/dev/null; then
             log SUCCESS "http server is started (pid:$SERVER_PID)"
         else
             log ERROR "http server is failed to start (pid:$SERVER_PID)"
         fi
         ;;
     stop)
-        if ! kill -n 0 "$SERVER_PID" 2>/dev/null; then
+        if ! kill -0 "$SERVER_PID" 2>/dev/null; then
             log WARN "http server is not running with (pid:$SERVER_PID)"
             return
         fi
@@ -345,7 +346,11 @@ while true; do
         esac
     fi
 
-    http_server stop
+    if [[ $HTTP_SERVER_AUTO_STOP == true ]]; then 
+        http_server stop
+    else
+        log WARN "Server will continue to run in background as HTTP_SERVER_AUTO_STOP=$HTTP_SERVER_AUTO_STOP"
+    fi
     log "Next check is after $CHECK_INTERVAL"
     sleep "$CHECK_INTERVAL"
 done
