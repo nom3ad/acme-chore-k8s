@@ -194,20 +194,53 @@ function update_secret() {
     kubectl "${KUBECTL_ARGS[@]}" create secret tls "$TLS_SECRET" --save-config --dry-run=client --cert="$1" --key="$2" -o yaml | kubectl "${KUBECTL_ARGS[@]}" apply -f -
 }
 
-function test_server() {
-    local pid tmp_file
-    pid=$(jobs -p '%socat' 2>/dev/null || true)
-    if [[ $1 == "start" && -z $pid ]]; then
-        log "Starting test server at port $PORT"
-        local tmp_file="/tmp/_acme_chore_server_response"
-        echo -en "HTTP/1.0 200 OK\nContent-Length: ${#RUN_ID}\n\n$RUN_ID" >$tmp_file
-        socat -dd -T 5 TCP-LISTEN:$PORT,crlf,reuseaddr,fork SYSTEM:"cat $tmp_file" &
-    fi
-    if [[ $1 == "stop" && -n $pid ]]; then
-        log "Stopping test server pid:$pid"
-        kill -s SIGTERM "$pid"
-        wait "$pid" || return 0
-    fi
+function http_server() {
+    case "$1" in
+    start)
+        if kill -n 0 "$SERVER_PID" 2>/dev/null; then
+            log WARN "http server is already running as pid: $SERVER_PID"
+            return
+        fi
+        log "Starting http server at port $PORT"
+        local www_dir="$DATA_DIR/www"
+        mkdir -p "$www_dir/.well-known/acme-challenge"
+        echo "$RUN_ID" >"$www_dir/.well-known/acme-challenge/__check"
+        # local tmp_file="/tmp/_acme_chore_server_response"
+        # echo -en "HTTP/1.0 200 OK\nContent-Length: ${#RUN_ID}\n\n$RUN_ID" >$tmp_file
+        # socat -dd -T 5 TCP-LISTEN:$PORT,crlf,reuseaddr,fork SYSTEM:"cat $tmp_file" &
+        if command -v thttpd >/dev/null; then
+            http_cmd="thttpd -d $www_dir -p $PORT -D"
+        elif command -v mini_httpd >/dev/null; then
+            http_cmd="mini_httpd -d $www_dir"
+        elif command -v darkhttpd >/dev/null; then
+            http_cmd="darkhttpd $www_dir --port PORT"
+        else
+            log ERROR "No http server commands found!"
+            return 2
+        fi
+        log "http server command: $http_cmd"
+        eval "$http_cmd &"
+        SERVER_PID=$!
+        sleep 1s
+        if kill -n 0 "$SERVER_PID" 2>/dev/null; then
+            log SUCCESS "http server is started (pid:$SERVER_PID)"
+        else
+            log ERROR "http server is failed to start (pid:$SERVER_PID)"
+        fi
+        ;;
+    stop)
+        if ! kill -n 0 "$SERVER_PID" 2>/dev/null; then
+            log WARN "http server is not running with (pid:$SERVER_PID)"
+            return
+        fi
+        log "Stopping http server (pid:$SERVER_PID)"
+        kill -s SIGTERM "$SERVER_PID"
+        wait "$SERVER_PID" || return 0
+        ;;
+    *)
+        return 2
+        ;;
+    esac
 }
 
 function test_http01_challenge_endpoints {
@@ -243,10 +276,13 @@ function do_acme() {
         args+=("--force")
     fi
 
+    # args+=("--standalone")
+    args+=("--webroot" "$DATA_DIR/www")
+
     if [[ $HTTP_SCHEME == "https" ]]; then
-        args+=("--standalone" "--alpn" "--tlsport" "$PORT")
+        args+=("--alpn" "--tlsport" "$PORT")
     else
-        args+=("--standalone" "--httpport" "$PORT")
+        args+=("--httpport" "$PORT")
     fi
     if [[ -n $VALID_TO ]]; then
         args+=("--valid-to" "$VALID_TO")
@@ -285,7 +321,7 @@ trap 'echo "[exit handler]" && jobs %% 2>/dev/null && echo "Killing background t
 load_ca_config
 
 while true; do
-    test_server start
+    http_server start
     if ! test_http01_challenge_endpoints; then
         retry=10s
         log ERROR "ACME http01 challenge endpoints test failed! Did you configure Ingress rule? Did you update DNS record?  Will retry after $retry"
@@ -294,7 +330,6 @@ while true; do
     else
         log SUCCESS "All ACME http01 challenge endpoints are reachable"
     fi
-    test_server stop
 
     if check_certificate_is_good && [[ $FORCE_RENEW != now ]]; then
         log SUCCESS "Certificate is good. Nothing to do"
@@ -310,6 +345,7 @@ while true; do
         esac
     fi
 
+    http_server stop
     log "Next check is after $CHECK_INTERVAL"
     sleep "$CHECK_INTERVAL"
 done
