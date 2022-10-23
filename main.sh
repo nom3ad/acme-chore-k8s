@@ -70,6 +70,7 @@ IFS=$',:\n \t|' read -r -a DOMAINS <<<"$DOMAINS"
 if [[ $DEBUG == "true" ]]; then
     DEBUG="1"
 fi
+DEBUG=$((DEBUG * 1))
 
 if [[ ! -d $DATA_DIR ]]; then
     log "Creating data directory: $DATA_DIR"
@@ -279,7 +280,7 @@ function do_acme() {
 
 log "Domains=${DOMAINS[*]/ /|} Email=$EMAIL Secret=$NAMESPACE/$TLS_SECRET CAServer=$CA_SERVER CheckInterval=$CHECK_INTERVAL UpdateBeforeDays=$UPDATE_BEFORE_DAYS HttpScheme=$HTTP_SCHEME Port=$PORT"
 
-trap 'echo "[At exit hook]" && jobs %% 2>/dev/null && echo "Killing background tasks..." && kill -s SIGTERM $(jobs -p) && wait' EXIT
+trap 'echo "[exit handler]" && jobs %% 2>/dev/null && echo "Killing background tasks..." && kill -s SIGTERM $(jobs -p) && wait' EXIT
 
 load_ca_config
 
