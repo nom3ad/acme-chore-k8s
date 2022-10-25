@@ -304,7 +304,8 @@ function do_acme() {
         return 0
     fi
     if [[ $EC -eq 0 ]]; then
-        local crt_file="$DATA_DIR/${DOMAINS[0]}/${DOMAINS[0]}.cer"
+        # TODO. use ca.pem for fullchain[1:] and crt.pem for fullchain[0] 
+        local crt_file="$DATA_DIR/${DOMAINS[0]}/fullchain.cer"
         local key_file="$DATA_DIR/${DOMAINS[0]}/${DOMAINS[0]}.key"
         log SUCCESS "ACME exchange is success. | Certificate: $(openssl x509 -noout -subject -issuer -startdate -enddate -fingerprint -ext subjectAltName <"$crt_file" | tr '\n' ' ')"
         update_secret "$crt_file" "$key_file"
