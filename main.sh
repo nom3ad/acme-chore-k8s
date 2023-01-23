@@ -97,12 +97,28 @@ function check_certificate_is_good() {
     fi
 
     log "Checking state of certificate: $(openssl x509 -noout -subject -issuer -startdate -enddate -fingerprint -ext subjectAltName <<<"$pem" | tr '\n' ' ')"
-
-    local issuer subject ca
+    local issuer subject ca cn san domains
     issuer=$(openssl x509 -noout -issuer <<<"$pem")
     issuer=${issuer/"issuer="/}
     subject=$(openssl x509 -noout -subject <<<"$pem")
     subject=${subject/"subject="/}
+
+    san=$(openssl x509 -noout -ext subjectAltName <<<"$pem")
+    san=${san/"X509v3 Subject Alternative Name:"/}
+    san=${san//"DNS:"/}
+    san=${san//[[:space:]]/}
+    readarray -d ',' -t domains < <(printf '%s' "$san")
+    cn="${subject##*"CN = "}"
+    cn="${cn%%" "*}"
+    domains+=("$cn")
+    log "Domains found in the certificates: ${domains[*]}"
+    for d in "${DOMAINS[@]}"; do
+        if [[ ! " ${domains[*]} " == *" $d "* ]]; then
+            log WARN "Certificate is not issued for $d domain"
+            return 1
+        fi
+    done
+
     case "$issuer" in
     "$subject")
         log WARN "Certificate is self-signed"
@@ -304,7 +320,7 @@ function do_acme() {
         return 0
     fi
     if [[ $EC -eq 0 ]]; then
-        # TODO. use ca.pem for fullchain[1:] and crt.pem for fullchain[0] 
+        # TODO. use ca.pem for fullchain[1:] and crt.pem for fullchain[0]
         local crt_file="$DATA_DIR/${DOMAINS[0]}/fullchain.cer"
         local key_file="$DATA_DIR/${DOMAINS[0]}/${DOMAINS[0]}.key"
         log SUCCESS "ACME exchange is success. | Certificate: $(openssl x509 -noout -subject -issuer -startdate -enddate -fingerprint -ext subjectAltName <"$crt_file" | tr '\n' ' ')"
@@ -347,7 +363,7 @@ while true; do
         esac
     fi
 
-    if [[ $HTTP_SERVER_AUTO_STOP == true ]]; then 
+    if [[ $HTTP_SERVER_AUTO_STOP == true ]]; then
         http_server stop
     else
         log WARN "Server will continue to run in background as HTTP_SERVER_AUTO_STOP=$HTTP_SERVER_AUTO_STOP"
